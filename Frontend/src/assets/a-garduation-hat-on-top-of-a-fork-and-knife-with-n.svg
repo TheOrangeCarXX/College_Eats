@@ -1,0 +1,47 @@
+<svg preserveAspectRatio="xMidYMid meet" width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  
+  <rect width="400" height="400" fill="#FFF8F6"/>
+  
+  
+  <circle cx="100" cy="100" r="3" fill="#FF7043" opacity="0.3"/>
+  <circle cx="300" cy="80" r="2" fill="#FFA726" opacity="0.4"/>
+  <circle cx="320" cy="320" r="4" fill="#FF7043" opacity="0.2"/>
+  <circle cx="80" cy="300" r="2.5" fill="#FFA726" opacity="0.3"/>
+  
+  
+  <rect x="40" y="120" width="320" height="160" rx="12" fill="white" stroke="#FF7043" stroke-width="2"/>
+  
+  
+  <g transform="translate(200, 150)">
+    
+    <path d="m0 -10 2 7 8 2-8 2-2 7-2-7-8-2 8-2Z" fill="#FF7043"/>
+  </g>
+  
+  
+  <text x="200" y="210" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#4E342E">
+    We're upgrading our AI!
+  </text>
+  
+  
+  <text x="200" y="235" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#6D4C41">
+    Back in a moment
+  </text>
+  
+  
+  <g transform="translate(200, 255)">
+    <circle cx="-12" cy="0" r="3" fill="#FF7043">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0s"/>
+    </circle>
+    <circle cx="0" cy="0" r="3" fill="#FF7043">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="12" cy="0" r="3" fill="#FF7043">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+  </g>
+  
+  
+  <text x="200" y="340" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#8D6E63">
+    Thanks for your patience!
+  </text>
+</svg> 
