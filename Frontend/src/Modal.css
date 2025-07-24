@@ -1,0 +1,20 @@
+/* This class styles the semi-transparent background */
+.modal-overlay {
+background-color: rgba(0, 0, 0, 0.75)
+}
+
+/* This class styles the modal window itself */
+.modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 2rem;
+}
