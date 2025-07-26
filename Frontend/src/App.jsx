@@ -9,11 +9,36 @@ Modal.setAppElement('#root');
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState();
+  const [username, setUsername] = useState();
   const [password, setPassword] = useState();
-  function handleSubmit(event) {
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-  }
+    try {
+      const response = await fetch('http://localhost:3001/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Sign up successful!');
+        setIsModalOpen(false);
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    } 
+    
+    catch (error) {
+      console.error('Failed to send data to the server:', error);
+      alert('Failed to connect to the server.');
+    }
+  };
   return (
     <>
       <Logo/>
@@ -29,6 +54,8 @@ function App() {
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input type="email" id="email" name="email" required placeholder='Enter Email' onChange={e => setEmail(e.target.value)}/>
+          <label htmlFor="username">Username</label>
+          <input type="username" id="username" name="username" required placeholder='Enter Username' onChange={e => setUsername(e.target.value)}/>
           <label htmlFor="password">Password</label>
           <input type="password" id="password" name="password" required placeholder="Enter Password" onChange={e => setPassword(e.target.value)}/>
           <Button type="submit">Submit</Button>
