@@ -1,7 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -37,6 +36,30 @@ app.post('/signup', (req, res) => {
     }
     console.log('User created successfully!');
     res.status(201).json({ message: 'User created successfully!' });
+  });
+});
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  const sql = "SELECT * FROM users WHERE username = ?";
+  
+  db.query(sql, [username], (err, results) => {
+    if (err) {
+      console.error('Database error during login:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const user = results[0];
+
+    if (password !== user.password) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    res.status(200).json({ message: 'Login successful!' });
   });
 });
 
