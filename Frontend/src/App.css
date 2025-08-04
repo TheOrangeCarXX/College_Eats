@@ -4,27 +4,3 @@
   padding: 2rem;
   text-align: center;
 }
-
-h3 {
-  position: absolute;
-  top: 75px;
-  left: 0;
-  margin: 1em;
-  color:#ffffff;
-}
-
-.slogan {
-  position: absolute;
-  top: 115px;
-  left: 0;
-  margin-top: 0.6em;
-  margin-left: 1em;
-  font-size: 0.8em;
-  color: #888;
-}
-h1 {
-  position: absolute;
-  top: 150px;
-  left: 50%;
-  transform: translateX(-50%);
-}

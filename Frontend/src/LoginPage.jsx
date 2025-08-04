@@ -92,7 +92,7 @@ function LoginPage() {
       if (response.ok) {
         alert('Login successful!');
         login(data.user); 
-        navigate('/dashboard');
+        navigate('/restaurants ');
         setIsLoginOpen(false);
       } else {
         alert(`Error: ${data.error}`);

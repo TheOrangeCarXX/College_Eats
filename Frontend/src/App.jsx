@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import LoginPage from './LoginPage';
-import Dashboard from './Dashboard';
+import Restaurant from './Restaurant';
 import ProtectedRoute from './ProtectedRoute';
 import { AuthProvider } from './AuthContext';
 import './App.css';
@@ -11,10 +11,10 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route
-          path="/dashboard"
+          path="/restaurants"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Restaurant />
             </ProtectedRoute>
           }
         />

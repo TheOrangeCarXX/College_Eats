@@ -45,26 +45,45 @@ const verificationData = {};
 // This route DOES NOT interact with the database. It only sends an email.
 app.post('/signup', (req, res) => {
   const { email, username, password } = req.body;
-
   if (!email.endsWith('@iiitb.ac.in')) {
     return res.status(400).json({ error: 'Invalid email domain. Must be @iiitb.ac.in' });
   }
-  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  verificationData[email] = { username, password, code: verificationCode };
-  const mailOptions = {
-      from: 'collegeeatsxx@gmail.com',
-      to: email,
-      subject: 'College Eats - Email Verification',
-      text: `Your verification code is: ${verificationCode}`
-  };
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      // --- DEBUGGING STEP ---
-      // This will print the detailed error from Nodemailer to your server console.
-      console.error('Nodemailer Error:', error); 
-      return res.status(500).json({ error: 'Failed to send verification email.' });
+  const sql = "SELECT password FROM users WHERE email = ?";
+  db.query(sql,[email], (err, results) => {
+    if (err) {
+      console.error('Database error during signup:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
-    res.status(200).json({ message: 'Verification email sent.' });
+    if (results.length > 0) {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+    const sql2 = "SELECT password FROM users WHERE username = ?";
+    db.query(sql2,[username], (err, results) => {
+      if (err) { 
+        console.error('Database error during signup:', err);
+        return res.status(500).json({ error: 'Server error' });
+      }
+      if (results.length > 0) {
+        return res.status(400).json({ error: 'Username already exists' });
+      }
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    verificationData[email] = { username, password, code: verificationCode };
+    const mailOptions = {
+        from: 'collegeeatsxx@gmail.com',
+        to: email,
+        subject: 'College Eats - Email Verification',
+        text: `Your verification code is: ${verificationCode}`
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        // --- DEBUGGING STEP ---
+        // This will print the detailed error from Nodemailer to your server console.
+        console.error('Nodemailer Error:', error); 
+        return res.status(500).json({ error: 'Failed to send verification email.' });
+      }
+      res.status(200).json({ message: 'Verification email sent.' });
+      });
+    });
   });
 });
 
@@ -121,6 +140,46 @@ app.post('/login', (req, res) => {
             username: user.username
         } 
     });
+  });
+});
+
+app.get('/restaurants', (req, res) => {
+  // This query now counts each occurrence of a name and groups them.
+  const sql = "SELECT name, COUNT(*) as count FROM restaurants GROUP BY name";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Database error fetching restaurants:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// Add this route to handle creating a new restaurant
+
+app.post('/restaurants/new', (req, res) => {
+  // Get the restaurant name from the request body
+  const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Restaurant name is required.' });
+  }
+
+  const sql = "INSERT INTO restaurants (name) VALUES (?)";
+
+  db.query(sql, [name], (err, result) => {
+    if (err) {
+      // Handle potential duplicate entry error
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(409).json({ error: 'This restaurant already exists.' });
+      }
+      console.error('Database error creating restaurant:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+    
+    // Send back a success message with the new restaurant's ID
+    res.status(201).json({ message: 'Restaurant added successfully!', newId: result.insertId });
   });
 });
 
