@@ -44,7 +44,7 @@ const verificationData = {};
 
 // This route DOES NOT interact with the database. It only sends an email.
 app.post('/signup', (req, res) => {
-  const { email, username, password } = req.body;
+  const { email, username, password, phonenumber} = req.body;
   if (!email.endsWith('@iiitb.ac.in')) {
     return res.status(400).json({ error: 'Invalid email domain. Must be @iiitb.ac.in' });
   }
@@ -67,7 +67,7 @@ app.post('/signup', (req, res) => {
         return res.status(400).json({ error: 'Username already exists' });
       }
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    verificationData[email] = { username, password, code: verificationCode };
+    verificationData[email] = { username, password, code: verificationCode, phonenumber};
     const mailOptions = {
         from: 'collegeeatsxx@gmail.com',
         to: email,
@@ -98,9 +98,9 @@ app.post('/verify', (req, res) => {
 
   // If the code is correct, it runs a SQL query to INSERT the new user
   // into the 'users' table in your 'college_eats' database.
-  const { username, password } = tempUser;
-  const sql = "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
-  const values = [email, username, password];
+  const { username, password, phonenumber } = tempUser;
+  const sql = "INSERT INTO users (email, username, password, phonenumber) VALUES (?, ?, ?, ?)";
+  const values = [email, username, password, phonenumber];
 
   db.query(sql, values, (err, result) => {
     if (err) {
@@ -145,7 +145,20 @@ app.post('/login', (req, res) => {
 
 app.get('/restaurants', (req, res) => {
   // This query now counts each occurrence of a name and groups them.
-  const sql = "SELECT name, COUNT(*) as count FROM restaurants GROUP BY name";
+  const sql = `
+    SELECT
+        r.id AS id,
+        r.name,
+        COUNT(rm.user_id) AS count
+    FROM
+        restaurants r
+    LEFT JOIN
+        restaurant_members rm ON r.id = rm.restaurant_id
+    GROUP BY
+        r.id, r.name
+    ORDER BY
+        r.name ASC;
+`;
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -180,6 +193,103 @@ app.post('/restaurants/new', (req, res) => {
     
     // Send back a success message with the new restaurant's ID
     res.status(201).json({ message: 'Restaurant added successfully!', newId: result.insertId });
+  });
+});
+
+app.get('/restaurants/:id/users', (req, res) => {
+  const restaurantId = req.params.id; // Get the restaurant ID from the URL parameter
+
+  // SQL query to fetch username, email, and phonenumber of users
+  // who are members of the specified restaurant.
+  const sql = `
+    SELECT
+        u.username,
+        u.email,
+        u.phonenumber
+    FROM
+        users u
+    JOIN
+        restaurant_members rm ON u.id = rm.user_id
+    WHERE
+        rm.restaurant_id = ?;
+  `;
+
+  db.query(sql, [restaurantId], (err, results) => {
+    if (err) {
+      console.error(`Database error fetching users for restaurant ${restaurantId}:`, err);
+      return res.status(500).json({ error: 'Server error fetching interested users' });
+    }
+    res.status(200).json(results); // Send the fetched user data as JSON
+  });
+});
+
+app.post('/restaurants/:id/join', (req, res) => {
+  const restaurantId = req.params.id;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required.' });
+  }
+
+  // First, check if the user is already a member of this restaurant
+  const checkSql = "SELECT COUNT(*) AS count FROM restaurant_members WHERE restaurant_id = ? AND user_id = ?";
+  db.query(checkSql, [restaurantId, userId], (err, results) => {
+    if (err) {
+      console.error('Database error checking membership:', err);
+      return res.status(500).json({ error: 'Server error checking membership' });
+    }
+
+    if (results[0].count > 0) {
+      // User is already a member, send a 409 Conflict status
+      return res.status(409).json({ error: 'You are already a member of this restaurant.' });
+    }
+
+    // If not a member, add the user to restaurant_members table
+    const insertSql = "INSERT INTO restaurant_members (restaurant_id, user_id) VALUES (?, ?)";
+    db.query(insertSql, [restaurantId, userId], (err, result) => {
+      if (err) {
+        console.error('Database error adding user to restaurant_members:', err);
+        return res.status(500).json({ error: 'Server error adding you to the restaurant' });
+      }
+      res.status(201).json({ message: 'Successfully joined the restaurant!' });
+    });
+  });
+});
+
+app.delete('/restaurants/:id/leave', (req, res) => {
+  const restaurantId = req.params.id;
+  const { userId } = req.body; // Expecting userId from the frontend
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required.' });
+  }
+
+  // First, check if the user is actually a member of this restaurant
+  const checkSql = "SELECT COUNT(*) AS count FROM restaurant_members WHERE restaurant_id = ? AND user_id = ?";
+  db.query(checkSql, [restaurantId, userId], (err, results) => {
+    if (err) {
+      console.error('Database error checking membership before leaving:', err);
+      return res.status(500).json({ error: 'Server error checking membership' });
+    }
+
+    if (results[0].count === 0) {
+      // User is not a member, cannot leave
+      return res.status(404).json({ error: 'You are not a member of this restaurant group.' });
+    }
+
+    // If user is a member, remove them from restaurant_members table
+    const deleteSql = "DELETE FROM restaurant_members WHERE restaurant_id = ? AND user_id = ?";
+    db.query(deleteSql, [restaurantId, userId], (err, result) => {
+      if (err) {
+        console.error('Database error removing user from restaurant_members:', err);
+        return res.status(500).json({ error: 'Server error leaving the restaurant group' });
+      }
+      // Check if any row was actually affected
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Could not find and remove your membership.' });
+      }
+      res.status(200).json({ message: 'Successfully left the restaurant group!' });
+    });
   });
 });
 

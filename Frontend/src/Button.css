@@ -1,0 +1,77 @@
+/* src/Button.css */
+
+.custom-button {
+    padding: 0.75rem 1.5rem; /* Consistent padding */
+    background-color: #4f46e5; /* Default indigo color */
+    color: white;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+    display: inline-flex; /* Allows text and icons to sit nicely */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* For link-like buttons */
+}
+
+.custom-button:hover {
+    background-color: #4338ca; /* Darker indigo on hover */
+    transform: translateY(-1px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.custom-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Specific button styles (override default custom-button) */
+.signup-button {
+    background-color: #10b981; /* Green for signup */
+}
+.signup-button:hover {
+    background-color: #059669;
+}
+
+.login-button {
+    background-color: #4f46e5; /* Indigo for login */
+}
+.login-button:hover {
+    background-color: #4338ca;
+}
+
+.add-restaurant-button {
+    background-color: #4f46e5;
+}
+.add-restaurant-button:hover {
+    background-color: #4338ca;
+}
+
+.join-button {
+    background-color: #10b981; /* Green for join */
+}
+.join-button:hover {
+    background-color: #059669;
+}
+
+.leave-button {
+    background-color: #ef4444; /* Red for leave */
+    margin-left: 0.5rem; /* Small margin from other buttons */
+}
+.leave-button:hover {
+    background-color: #dc2626;
+}
+
+.close-modal-button {
+    background-color: #4f46e5; /* Indigo for close */
+    margin-left: 0.5rem; /* Small margin from other buttons */
+}
+.close-modal-button:hover {
+    background-color: #4338ca;
+}
+
+.logout-button {
+    margin-top: 2rem;
+}

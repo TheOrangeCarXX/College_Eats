@@ -1,0 +1,7 @@
+h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: left; /* This property aligns the text content of the h3 to the left */
+    margin-top: 0; /* Ensure no default top margin pushes it down */
+    /* Add any other specific styles you want for all h3 elements here */
+}

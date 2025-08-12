@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './Modal.css';
+import './LoginPage.css';
 
 Modal.setAppElement('#root');
 function LoginPage() {
@@ -21,6 +22,7 @@ function LoginPage() {
   const [email, setEmail] = useState();
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
+  const [phonenumber, setPhonenumber] = useState();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -31,7 +33,7 @@ function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, username, password }),
+        body: JSON.stringify({ email, username, password, phonenumber}),
       });
 
       const data = await response.json();
@@ -110,10 +112,10 @@ function LoginPage() {
         Together Tastes Better
       </p>
       <h1>Order Food Together, Save Together</h1>
-      <Button onClick= {() => setIsSignupOpen(true)}>Sign In</Button>
+      <Button onClick= {() => setIsSignupOpen(true)}>Sign Up</Button>
       <Button onClick= {() => setIsLoginOpen(true)}> Login In</Button>
       <Modal isOpen={isSignupOpen} onRequestClose={() => {setIsSignupOpen(false); setShowVerification(false);}} className="modal-content" overlayClassName="modal-overlay">
-        <h2>Sign In</h2>
+        <h2>Sign Up</h2>
         {!showVerification ? (
           <form onSubmit={handleSubmit}>
             <label htmlFor="signup-email">College Email</label>
@@ -122,6 +124,8 @@ function LoginPage() {
             <input type="text" id="signup-username" required placeholder='Enter Username' onChange={e => setUsername(e.target.value)}/>
             <label htmlFor="signup-password">Password</label>
             <input type="password" id="signup-password" required placeholder="Enter Password" onChange={e => setPassword(e.target.value)}/>
+            <label htmlFor="signup-phonenumber">Phone Number</label>
+            <input type="tel" id="signup-phonenumber" required placeholder='Enter Phone Number' onChange={e => setPhonenumber(e.target.value)}/>
             <Button type="submit">Get Verification Code</Button>
           </form>
         ) : (
